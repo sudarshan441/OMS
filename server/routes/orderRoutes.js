@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
-const OrderController = require('../controllers/OrderController');
+const OrderController = require('../controllers/orderController');
 
 router.post('/', auth(['CUSTOMER', 'ADMIN']), OrderController.createOrder);
 router.get('/', auth(['ADMIN']), OrderController.getOrders);
