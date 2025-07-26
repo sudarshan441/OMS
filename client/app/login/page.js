@@ -48,7 +48,7 @@ export default function LoginPage() {
         <Button onClick={handleLogin}>Login</Button>
         {error && <p className="text-red-600">{error}</p>}
         <p className="text-sm">
-          Don't have an account?{" "}
+          Don&apos;t have an account?
           <a href="/register" className="text-blue-600 underline">
             Register here
           </a>
