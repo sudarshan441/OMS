@@ -1,5 +1,14 @@
 # 🛠️ Igniflo Order Management System (MERN Stack)
 
+---
+
+## 🌍 Live Demo
+
+- 🔗 Frontend (Next.js): [https://your-frontend.vercel.app](https://your-frontend.vercel.app)
+- 🔗 Backend (Express.js API): [https://your-backend.onrender.com](https://your-backend.onrender.com)
+
+---
+
 A full-stack order management system built using:
 
 - **Frontend**: Next.js + shadcn/ui
