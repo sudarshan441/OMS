@@ -39,7 +39,7 @@ export default function PlaceOrderPage() {
       });
       if (!customer.ok) throw new Error("Failed to create customer");
       customer = await customer.json();
-      
+
       const res = await fetch(`${API}/orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -85,21 +85,38 @@ export default function PlaceOrderPage() {
                   ₹{product.price} | Stock: {product.stock}
                 </p>
               </div>
-              <Input
-                type="number"
-                className="w-20"
-                min="0"
-                max={product.stock}
-                value={quantities[product._id] || ""}
-                onChange={(e) =>
-                  setQuantities({
-                    ...quantities,
-                    [product._id]: e.target.value,
-                  })
-                }
-              />
+              <div>
+                <p className="font-semibold text-gray-600">Qty:</p>
+                <Input
+                  type="number"
+                  className="w-20"
+                  min="0"
+                  max={product.stock}
+                  value={quantities[product._id] || ""}
+                  onChange={(e) =>
+                    setQuantities({
+                      ...quantities,
+                      [product._id]: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <p className="text-green-600 font-semibold">
+                ₹{product.price * (quantities[product._id] || 0)}
+              </p>
             </div>
           ))}
+
+          <p className="text-lg font-semibold mt-4">
+            Total: ₹
+            {products.reduce((total, product) => {
+              const quantity = quantities[product._id] || 0;
+              return total + product.price * quantity;
+            }, 0)}
+          </p>
+          <p className="text-sm text-gray-500">
+            Note: Ensure quantities do not exceed available stock.
+          </p>
         </div>
 
         <Button onClick={handleSubmit}>Submit Order</Button>
