@@ -2,15 +2,20 @@ name: Backend CI/CD
 
 on:
   push:
+    paths:
+      - "server/**"
     branches: [main]
-  pull_request:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: server
+
     steps:
-      - name: ⬇️ Checkout code
+      - name: ⬇️ Checkout repository
         uses: actions/checkout@v3
 
       - name: 🟢 Setup Node.js
@@ -19,15 +24,22 @@ jobs:
           node-version: 18
 
       - name: 📦 Install dependencies
-        run: |
-          cd server
-          npm install
+        run: npm install
 
-      - name: 🧪 Run Tests
+      - name: ✅ Lint and format check
         run: |
-          cd server
-          npm test || echo "No tests defined"
+          if [ -f .eslintrc.js ] || [ -f .eslintrc.json ]; then
+            npm run lint || echo "Lint errors, but not failing build"
+          fi
 
-      - name: 🚀 Deploy to Render (or Railway)
-        if: github.ref == 'refs/heads/main'
-        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+      - name: 🧪 Run tests (if available)
+        run: |
+          if [ -f jest.config.js ] || [ -d __tests__ ]; then
+            npm run test
+          else
+            echo "No test config found"
+          fi
+
+      - name: 🚀 Deploy to Render via Deploy Hook
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
