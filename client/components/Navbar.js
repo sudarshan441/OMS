@@ -35,7 +35,9 @@ export default function Navbar() {
         )}
 
         {user && (
-          <button onClick={logout} className="text-red-600 hover:underline">
+          <button onClick={() => {
+            logout()
+          }} className="text-red-600 hover:underline">
             Logout
           </button>
         )}

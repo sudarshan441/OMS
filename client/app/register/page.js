@@ -13,7 +13,7 @@ export default function RegisterPage() {
     name: "",
     email: "",
     password: "",
-    role: "customer",
+    role: "admin",
   });
   const [error, setError] = useState("");
   const { login } = useAuth();

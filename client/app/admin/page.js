@@ -29,7 +29,7 @@ export default function AdminPage() {
       if (!res.ok) {
         if (res.status === 401) {
           logout();
-          alert("Session expired, please log in again.");
+          alert("Session expired. Please log in again.");
           router.push("/login");
           return;
         } else {
@@ -52,7 +52,8 @@ export default function AdminPage() {
       socket.off("orderPlaced");
       socket.off("orderStatusUpdated");
     };
-  }, [token]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!authLoading && !token) {
