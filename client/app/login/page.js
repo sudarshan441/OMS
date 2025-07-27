@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { API } from "@/lib/api";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { useAuth } from "@/context/AuthContext";
 export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
-  const { token, user } = useAuth();
+  const { token } = useAuth();
   const { login } = useAuth();
   const router = useRouter();
 
@@ -24,16 +24,19 @@ export default function LoginPage() {
       if (!res.ok) throw new Error("Invalid credentials");
 
       const data = await res.json();
-      login(data.token, data.user); // ✅ Context-based
-      router.push("/admin"); // ✅ Soft redirect
+      login(data.token, data.user); 
+      router.push("/admin"); 
     } catch (err) {
       setError(err.message);
     }
   };
 
-  if (token && user?.role === "admin") {
-    router.push("/admin");
-  }
+    useEffect(() => {
+    if (token) {
+      router.push("/admin"); 
+    }
+  }, [token]);
+
 
   return (
     <div className="max-w-md mx-auto mt-20">

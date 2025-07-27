@@ -32,7 +32,7 @@ export default function AdminPage() {
           alert("Session expired, please log in again.");
           router.push("/login");
           return;
-        }else{
+        } else {
           throw new Error(data.error);
         }
       }
@@ -75,14 +75,15 @@ export default function AdminPage() {
     return <p className="text-center mt-10">Loading admin dashboard...</p>;
   }
 
-  const filteredOrders = allOrders.filter((order) =>
-    (order.customer?.name || "")
-      .toLowerCase()
-      .includes(search.toLowerCase()) ||
-    (order.customer?.email || "")
-      .toLowerCase()
-      .includes(search.toLowerCase()) ||
-    (order._id || "").toLowerCase().includes(search.toLowerCase())
+  const filteredOrders = allOrders.filter(
+    (order) =>
+      (order?.customer?.name || "")
+        .toLowerCase()
+        .includes(search.toLowerCase()) ||
+      (order?.customer?.email || "")
+        .toLowerCase()
+        .includes(search.toLowerCase()) ||
+      (order?._id || "").toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -91,7 +92,29 @@ export default function AdminPage() {
         <h1 className="text-2xl font-bold">Admin Dashboard</h1>
         <div className="space-x-2">
           <Button
-            onClick={() => window.open(`${API}/orders/export/csv`, "_blank")}
+            onClick={async () => {
+              try {
+                const res = await fetch(`${API}/orders/export/csv`, {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                });
+
+                if (!res.ok) throw new Error("Failed to export CSV");
+
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "orders.csv";
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+              } catch (err) {
+                alert("CSV export failed. Please try again.");
+                console.error("Export error:", err);
+              }
+            }}
           >
             Export CSV
           </Button>
@@ -115,22 +138,24 @@ export default function AdminPage() {
           <div className="flex justify-between">
             <div>
               <p>
-                <strong>Customer:</strong> {order.customer?.name} (
-                {order.customer?.email})
+                <strong>Customer:</strong>{" "}
+                {order?.customer
+                  ? `${order?.customer.name} (${order?.customer.email})`
+                  : "N/A"}
               </p>
               <p>
                 <strong>Payment:</strong>{" "}
-                {order.paymentCollected ? "✅ Yes" : "❌ No"}
+                {order?.paymentCollected ? "✅ Yes" : "❌ No"}
               </p>
               <p>
                 <strong>Status:</strong>{" "}
-                <Badge className="capitalize">{order.status}</Badge>
+                <Badge className="capitalize">{order?.status}</Badge>
               </p>
             </div>
             <div>
               <select
-                defaultValue={order.status}
-                onChange={(e) => updateStatus(order._id, e.target.value)}
+                defaultValue={order?.status}
+                onChange={(e) => updateStatus(order?._id, e.target.value)}
                 className="border rounded px-3 py-1"
               >
                 <option value="PENDING">Pending</option>
@@ -144,8 +169,8 @@ export default function AdminPage() {
             <strong>Items:</strong>
             <ul className="list-disc ml-5">
               {order.items.map((item) => (
-                <li key={item.product._id}>
-                  {item.product.name} × {item.quantity}
+                <li key={item?.product?._id}>
+                  {item?.product?.name} × {item?.quantity}
                 </li>
               ))}
             </ul>
