@@ -4,8 +4,8 @@
 
 ## 🌍 Live Demo
 
-- 🔗 Frontend (Next.js): [https://your-frontend.vercel.app](https://your-frontend.vercel.app)
-- 🔗 Backend (Express.js API): [https://your-backend.onrender.com](https://your-backend.onrender.com)
+- 🔗 Frontend (Next.js): [https://oms-ur4d.vercel.app/](https://oms-ur4d.vercel.app/)
+- 🔗 Backend (Express.js API): [https://oms-yteo.onrender.com/api](https://oms-yteo.onrender.com/api)
 
 ---
 
