@@ -5,7 +5,7 @@ A full-stack order management system built using:
 - **Frontend**: Next.js + shadcn/ui
 - **Backend**: Express.js + MongoDB + Socket.IO
 - **Auth**: JWT Role-Based Access (Admin/Customer)
-- **Deployment**: Vercel (client) + Railway (server)
+- **Deployment**: Vercel (client) + Render (server)
 - **CI/CD**: GitHub Actions
 
 ## 📦 Features
@@ -49,7 +49,7 @@ npm test
 ```env
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/igniflo-oms
-JWT_SECRET=your_jwt_secret
+JWT_SECRET=your_jwt_secret_here
 SENTRY_DSN=optional_sentry_dsn
 ```
 
@@ -64,8 +64,8 @@ SENTRY_DSN=optional_sentry_dsn
 ## ☁️ Deployment
 
 - Frontend: [Vercel](https://vercel.com)
-- Backend: [Railway](https://railway.app)
-- MongoDB: Railway Mongo Plugin or Atlas
+- Backend: [Render](https://render.com/)
+- MongoDB: [Atlas](https://www.mongodb.com/cloud/atlas) Mongo Plugin or Atlas
 
 CI/CD runs lint/test/deploy via GitHub Actions.
 

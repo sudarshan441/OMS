@@ -146,8 +146,8 @@ From button click → order creation → real-time update to admin
 | Component | Platform | Description                           |
 |----------|----------|---------------------------------------|
 | Frontend | Vercel   | Automatically deployed via GitHub Actions |
-| Backend  | Railway  | Node.js Express API + WebSocket + DB |
-| MongoDB  | Railway or Atlas | Persistent database storage       |
+| Backend  | Render   | Node.js Express API + WebSocket + DB |
+| MongoDB  | Atlas    | Persistent database storage       |
 
 ---
 
@@ -156,7 +156,7 @@ From button click → order creation → real-time update to admin
 ### Security
 
 - JWT authentication with role-based access
-- Route protection with middleware (`isAdmin`)
+- Route protection with middleware (`auth`)
 - Rate limiting (e.g., `express-rate-limit`)
 - Secure headers (`helmet`)
 - CORS configured
@@ -184,7 +184,6 @@ From button click → order creation → real-time update to admin
 - Mobile-first responsive design
 - Components: Form, Inputs, Dashboard table, Status badges, CSV Export
 - Reusable layout in `app/layout.js`
-- Route protection via `ProtectedRoute` component
 
 ---
 
