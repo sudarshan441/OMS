@@ -82,9 +82,6 @@ CI/CD runs lint/test/deploy via GitHub Actions.
 
 - [`docs/high-level-design.md`](./docs/high-level-design.md)
 
-## 📚 Documentation
-
-- [`docs/high-level-design.md`](./docs/high-level-design.md)
 
 ## 🧠 Git Workflow Note
 
