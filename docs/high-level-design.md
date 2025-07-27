@@ -1,92 +1,210 @@
-# 🧠 High-Level Design Document – Igniflo OMS (MERN Stack)
+# 🧠 High-Level Design Document – Igniflo Order Management System (MERN Stack)
+
+---
 
 ## 🏗️ Architecture Overview
 
 ### 🔄 Separation of Concerns
 
-- **Client (Next.js)**: Handles UI and Socket.IO client
-- **API Server (Express.js)**: Manages business logic and WebSocket events
-- **Database (MongoDB)**: Stores all data in collections
+| Layer       | Tech Used         | Responsibility                                      |
+|-------------|-------------------|-----------------------------------------------------|
+| Frontend    | Next.js (App Router) + shadcn/ui | User Interface (Admin + Customer), API calls, WebSocket events |
+| Backend     | Express.js + Socket.IO           | REST API, auth, business logic, real-time events     |
+| Database    | MongoDB (via Mongoose)           | Stores Users, Customers, Products, Orders            |
 
-## 🔁 Request Flow
+---
 
-1. User places order via `/order`
-2. Backend locks inventory, creates customer/order
-3. Response sent back with Order ID
+## 🔁 Request Flow (HTTP)
 
-## 🌐 Real-Time Flow
+1. User places order via `/place-order`
+2. Client sends POST request to `/api/orders`
+3. Server:
+   - Validates customer and inventory
+   - Creates new customer if not found
+   - Reserves inventory
+   - Creates order
+4. Sends response with `orderId`
+5. Frontend redirects user to `/track-order/:id`
 
-- Backend emits `orderPlaced` and `orderStatusUpdated` via Socket.IO
-- Clients subscribe to those events
+---
+
+## 📡 Real-Time Flow (WebSocket via Socket.IO)
+
+- Admin Dashboard connects to WebSocket on mount
+- When a new order is placed:
+  - Backend emits `orderPlaced`
+  - All connected clients receive update (admin UI re-renders)
+- When order status is updated:
+  - Backend emits `orderStatusUpdated`
+  - Admin and tracking UI update accordingly
+
+---
 
 ## 🧩 Component Breakdown
 
-- **Pages**: `/order`, `/track-order/:id`, `/admin`
-- **Shared Components**: Form, Table, Status Badge, CSV Export
-- **State**: Context API or Zustand (optional)
+### Client
 
-## 🗃️ Database Schema
+| Page               | Purpose                            |
+|--------------------|-------------------------------------|
+| `/login`           | Admin authentication                |
+| `/register`        | Admin registration (optional)       |
+| `/admin`           | Admin dashboard with filtering, updates |
+| `/place-order`     | Customer places order               |
+| `/track-order/:id` | Customer checks order status        |
 
-### ER Model
+### Shared Components
 
-- **User**: name, email, password, role
-- **Customer**: name, email
-- **Product**: name, price, stock
-- **Order**: customer, items[], paymentCollected, status
+- `Navbar`, `ProtectedRoute`, `Form`, `StatusBadge`, `Card`, `Input`, `Button`, `CSVExportButton`
 
-### Indexing Strategy
+### State Management
 
-| Collection | Index |
-|------------|--------|
-| users      | email (unique) |
-| customers  | email (unique) |
-| products   | name (text)    |
-| orders     | customer, status |
+- React `Context API` for Auth
+- `useState` / `useEffect` for local state
+- WebSocket events using `socket.io-client`
+
+---
+
+## 🗃️ Database Schema (ERD)
+
+### 📦 Collections
+
+#### User
+
+- `name`: String
+- `email`: String (unique)
+- `password`: Hashed
+- `role`: `admin` or `customer`
+
+#### Customer
+
+- `name`, `email`
+
+#### Product
+
+- `name`
+- `price`
+- `stock`
+
+#### Order
+
+- `customer` → references `Customer`
+- `items`: Array of `{ product, quantity }`
+- `status`: Enum (`PENDING`, `PAID`, `FULFILLED`, `CANCELLED`)
+- `paymentCollected`: Boolean
+
+### 🧮 Indexing Strategy
+
+| Collection | Index Fields        |
+|------------|---------------------|
+| `users`    | `email` (unique)    |
+| `customers`| `email` (unique)    |
+| `products` | `name` (text)       |
+| `orders`   | `customer`, `status`|
+
+---
 
 ## 📡 API Contract
 
-| Endpoint             | Method | Auth | Description              |
-|----------------------|--------|------|--------------------------|
-| /auth/register       | POST   | ❌   | Register new user        |
-| /auth/login          | POST   | ❌   | Login and get JWT        |
-| /api/orders          | POST   | ✅   | Place order              |
-| /api/orders/:id      | GET    | ❌   | Get order by ID          |
-| /api/orders/:id/status | PUT | ✅   | Update order status      |
-| /api/orders/export/csv | GET | ✅   | Export orders to CSV     |
-| /api/products        | GET/POST | ✅ | List or create products  |
-| /api/customers       | GET/POST | ✅ | List or create customers |
+| Endpoint                      | Method | Auth | Description                       |
+|-------------------------------|--------|------|-----------------------------------|
+| `/auth/register`             | POST   | ❌   | Register a new user               |
+| `/auth/login`                | POST   | ❌   | Login and receive JWT             |
+| `/api/orders`                | GET    | ✅   | List all orders (admin)           |
+| `/api/orders`                | POST   | ❌   | Place a customer order            |
+| `/api/orders/:id`            | GET    | ❌   | Get order by ID                   |
+| `/api/orders/:id/status`     | PUT    | ✅   | Update order status (admin)       |
+| `/api/orders/export/csv`     | GET    | ✅   | Export orders to CSV (admin)      |
+| `/api/products`              | GET    | ✅   | List products                     |
+| `/api/products`              | POST   | ✅   | Create product                    |
+| `/api/customers`             | GET    | ✅   | List customers                    |
+| `/api/customers`             | POST   | ✅   | Create customer                   |
+| `/healthz`                   | GET    | ❌   | Health check                      |
 
-## 📤 Sequence – Place Order
+---
 
-1. UI sends POST /api/orders
-2. Backend checks stock and customer
-3. Order is created, stock is reserved
-4. WebSocket event is emitted
+## 📤 Sequence Diagram – Place Order
+
+### Description
+
+From button click → order creation → real-time update to admin
+
+1. User submits order form → `POST /api/orders`
+2. Server:
+   - Validates and finds/creates customer
+   - Checks and reserves stock
+   - Saves order
+3. Emits `orderPlaced` WebSocket event
+4. Admin dashboard receives real-time update
+5. Response returns `orderId` → Client redirects to `/track-order/:id`
+
+*Diagram Recommendation:* Use [https://sequencediagram.org/](https://sequencediagram.org/) to visualize
+
+---
 
 ## ☁️ Deployment Topology
 
-| Component | Platform |
-|-----------|----------|
-| Client    | Vercel   |
-| API       | Railway  |
-| DB        | Railway Mongo |
+| Component | Platform | Description                           |
+|----------|----------|---------------------------------------|
+| Frontend | Vercel   | Automatically deployed via GitHub Actions |
+| Backend  | Railway  | Node.js Express API + WebSocket + DB |
+| MongoDB  | Railway or Atlas | Persistent database storage       |
+
+---
 
 ## 🔐 Security & Observability
 
-- Auth: JWT + Role-Based Access
-- Rate Limiting: express-rate-limit
-- Headers: Helmet
-- Logging: Pino
-- Error Tracking: Sentry (optional)
-- Health: `/healthz`
+### Security
 
-## 🛠️ DB Setup
+- JWT authentication with role-based access
+- Route protection with middleware (`isAdmin`)
+- Rate limiting (e.g., `express-rate-limit`)
+- Secure headers (`helmet`)
+- CORS configured
 
-- Seed via `node seed.js`
-- Referential integrity via Mongoose population
-- Indexes via schema `.index()` method
+### Observability
 
-## 🖼️ UI Design
+- Logging: `pino`
+- Error monitoring: Sentry (optional)
+- Health endpoint: `/healthz`
 
-- Built with `shadcn/ui`
-- Responsive, form-based dashboard
+---
+
+## 🛠️ Database Setup
+
+- Mongoose schema definitions with `.index()`
+- Referential integrity with `.populate()`
+- Seeding script: `node seed.js`
+- Can be tested with Postman or Insomnia
+
+---
+
+## 🎨 UI Design
+
+- Built with `shadcn/ui` and TailwindCSS
+- Mobile-first responsive design
+- Components: Form, Inputs, Dashboard table, Status badges, CSV Export
+- Reusable layout in `app/layout.js`
+- Route protection via `ProtectedRoute` component
+
+---
+
+## 🧪 Testing
+
+- Manual test cases for all major flows
+- Future scope: integrate Jest + Supertest for API testing
+
+---
+
+## ✅ Done & Delivered
+
+- [x] Role-based login
+- [x] Customer order placement
+- [x] Real-time admin updates
+- [x] Track order by ID
+- [x] CSV export for reporting
+- [x] Responsive UI
+- [x] Health check + rate limiting
+- [x] CI/CD on both frontend (Vercel) and backend (Render)
+
+---
+

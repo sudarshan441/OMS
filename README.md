@@ -72,3 +72,12 @@ CI/CD runs lint/test/deploy via GitHub Actions.
 ## 📚 Documentation
 
 - [`docs/high-level-design.md`](./docs/high-level-design.md)
+
+## 📚 Documentation
+
+- [`docs/high-level-design.md`](./docs/high-level-design.md)
+
+## 🧠 Git Workflow Note
+
+> 🔧 **Note:** Feature branches and atomic commits were intentionally skipped to prioritize delivery speed and a fully working end-to-end solution within the assignment timeframe.  
+> In production, I follow best practices like atomic commits, descriptive messages, and branching strategies (feature, hotfix, etc.) for maintainability.
