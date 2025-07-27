@@ -31,6 +31,7 @@ export default function TrackOrderPage() {
         <h2 className="text-xl font-bold">Order Status</h2>
         <p><strong>Customer:</strong> {order.customer?.name}</p>
         <p><strong>Email:</strong> {order.customer?.email}</p>
+        <p><strong>Order ID:</strong> {order._id}</p>
         <p>
           <strong>Status:</strong>{' '}
           <Badge variant="outline" className="capitalize">{order.status}</Badge>

@@ -14,18 +14,28 @@ const socket = io(API.replace("/api", ""));
 export default function AdminPage() {
   const router = useRouter();
   const { token, logout, loading: authLoading } = useAuth();
-
   const [allOrders, setAllOrders] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
   const fetchOrders = async () => {
+    console.log("Fetching orders with token:", token);
     try {
       const res = await fetch(`${API}/orders`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       const data = await res.json();
+      if (!res.ok) {
+        if (res.status === 401) {
+          logout();
+          alert("Session expired, please log in again.");
+          router.push("/login");
+          return;
+        }else{
+          throw new Error(data.error);
+        }
+      }
       setAllOrders(data);
       setLoading(false);
     } catch (err) {

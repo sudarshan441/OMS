@@ -10,6 +10,7 @@ import { useAuth } from "@/context/AuthContext";
 export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const { token, user } = useAuth();
   const { login } = useAuth();
   const router = useRouter();
 
@@ -29,6 +30,10 @@ export default function LoginPage() {
       setError(err.message);
     }
   };
+
+  if (token && user?.role === "admin") {
+    router.push("/admin");
+  }
 
   return (
     <div className="max-w-md mx-auto mt-20">

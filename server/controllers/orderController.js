@@ -15,8 +15,8 @@ exports.createOrder = async (req, res) => {
       await product.save();
     }
 
-    const order = await Order.create({ customer, items, paymentCollected });
-
+    const order = await Order.create({ customer: customer._id, items, paymentCollected });
+    console.log(order)
     // Emit real-time status via socket (optional, add io in next step)
     const io = req.app.get("io");
     io.emit("orderPlaced", order);

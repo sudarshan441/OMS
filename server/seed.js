@@ -6,7 +6,7 @@ const Product = require("./models/Product");
 dotenv.config();
 
 mongoose.connect(process.env.MONGO_URI).then(async () => {
-  logger.info("MongoDB connected");
+  console.log("MongoDB connected");
 
   await Customer.deleteMany();
   await Product.deleteMany();
@@ -20,6 +20,6 @@ mongoose.connect(process.env.MONGO_URI).then(async () => {
     { name: "Widget B", price: 200, stock: 10 },
   ]);
 
-  logger.info("Seeding complete");
+  console.log("Seeding complete");
   mongoose.disconnect();
 });
